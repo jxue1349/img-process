@@ -27,13 +27,12 @@ def img_process(inputfile, basefile, outputfile):
 	base_tmp = cv2.cvtColor(image_base, cv2.COLOR_BGR2GRAY)
 	# blur = cv2.GaussianBlur(base_tmp, (5,5), 0)
 	blur = cv2.blur(base_tmp,(100,100))
-	thresh = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY)[1]
-	cv2.imshow('thresh', thresh)
-	cv2.namedWindow('thresh',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('thresh', 60, 60)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	circles = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 10, param1=100, param2=20, minRadius=300, maxRadius=0)
+	thresh = cv2.threshold(blur, 150, 255, cv2.THRESH_BINARY)[1]
+	# cv2.imshow('thresh', thresh)
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
+	# cv2.imwrite('thresh.png', thresh)
+	circles = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 10, param1=100, param2=20, minRadius=0, maxRadius=0)
 	circles = np.uint16(np.around(circles))
 	max_radius = 0
 	max_center_x = 0
@@ -42,7 +41,7 @@ def img_process(inputfile, basefile, outputfile):
 	yc=0
 	cc=0
 	for i in circles[0,:]:
-		# cv2.circle(thresh,(i[0],i[1]),i[2],(0,255,0),2)
+		# cv2.circle(image_base,(i[0],i[1]),i[2],(0,255,0),2)
 		xc+=i[0]
 		yc+=i[1]
 		cc+=1
@@ -51,13 +50,15 @@ def img_process(inputfile, basefile, outputfile):
 			# max_center_x = i[0]
 			# max_center_y = i[1]
 		# draw the outer circle
-	cv2.circle(image_base,(int(xc/cc),int(yc/cc)),max_radius+100,(0,255,0),2)
-	cv2.imshow('image', image_base)
-	cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('image', 60,60)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	# cv2.imwrite(outputfile, image_base)
+	xc = int(xc/cc)
+	yc = int(yc/cc)
+	rad= int(max_radius*(1+(100/max_radius)))
+	# cv2.circle(image_base,(xc,yc), rad,(0,255,0),2)
+	# cv2.imshow('image', image_base)
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
+
+	cv2.imwrite(outputfile, image_base[yc-rad:yc+rad,xc-rad:xc+rad])
 
 
 
